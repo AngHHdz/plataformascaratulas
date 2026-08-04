@@ -1,0 +1,118 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Carátula SSA PRO</title>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<style>
+textarea {
+    width: 100%;
+    height: 120px;
+}
+</style>
+</head>
+
+<body>
+
+<h3>GENERA TU HOJA DE TRANSFERENCIA DE RIESGO</h3>
+
+<textarea id="data" placeholder="VIN   PUERTO   DESTINO   PLATAFORMA"></textarea><br>
+
+<button onclick="generarPDF()">Descargar PDF</button>
+
+<script>
+async function generarPDF() {
+
+    // 🔥 NUEVO: cargar imagen desde el repo
+    const response = await fetch("CARATULA.png");
+    const blob = await response.blob();
+
+    const reader = new FileReader();
+
+    reader.onload = async function(e) {
+
+        const imgData = e.target.result;
+
+        const { jsPDF } = window.jspdf;
+        let pdf = new jsPDF('landscape', 'px', [3300, 2550]);
+
+        const texto = document.getElementById("data").value.trim();
+        const lineas = texto.split("\n");
+
+        let datos = [];
+
+        lineas.forEach(l => {
+            let p = l.split(/\t|,/);
+            if (p.length >= 4) {
+                datos.push({ vin: p[0], puerto: p[1], destino: p[2], transporte: p[3] });
+            }
+        });
+
+        // AGRUPAR
+        let grupos = {};
+        datos.forEach(d => {
+            if (!grupos[d.transporte]) grupos[d.transporte] = [];
+            grupos[d.transporte].push(d);
+        });
+
+        let primera = true;
+
+        for (let t in grupos) {
+
+            let grupo = grupos[t];
+
+            for (let i = 0; i < grupo.length; i += 22) {
+
+                if (!primera) pdf.addPage();
+                primera = false;
+
+                pdf.addImage(imgData, 'PNG', 0, -10, 3350, 2550);
+
+                let bloque = grupo.slice(i, i + 22);
+
+                bloque.forEach((item, index) => {
+
+const filasY = [];
+
+const inicio = 717;      // Primera fila
+const separacion = 61.5; // Distancia entre renglones
+
+for (let i = 0; i < 22; i++) {
+    filasY.push(inicio + i * separacion);
+}
+
+                    let y = filasY[index];
+
+                    // VIN
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setFontSize(44);
+                    pdf.text(item.vin, 210, y);
+
+                    // PUERTO
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setFontSize(40);
+                    pdf.text(item.puerto, 900, y);
+                    
+                    // DESTINO
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setFontSize(40);
+                    pdf.text(item.destino, 1180, y);
+                });
+
+                // TRANSPORTE
+                pdf.setFontSize(60);
+                pdf.text(t, 2900, 300);
+            }
+        }
+
+        pdf.save("HOJAS DE TRANSFERENCIA.pdf");
+    };
+
+    reader.readAsDataURL(blob);
+}
+</script>
+
+</body>
+</html>
