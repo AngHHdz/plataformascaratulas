@@ -76,7 +76,7 @@ async function generarPDF() {
 
 const filasY = [];
 
-const inicio = 717;      // Primera fila
+const inicio = 719;      // Primera fila
 const separacion = 61.5; // Distancia entre renglones
 
 for (let i = 0; i < 22; i++) {
@@ -93,12 +93,12 @@ for (let i = 0; i < 22; i++) {
                     // PUERTO
                     pdf.setFont("helvetica", "bold");
                     pdf.setFontSize(40);
-                    pdf.text(item.puerto, 900, y);
+                    pdf.text(item.puerto, 950, y);
                     
                     // DESTINO
                     pdf.setFont("helvetica", "bold");
                     pdf.setFontSize(40);
-                    pdf.text(item.destino, 1180, y);
+                    pdf.text(item.destino, 1220, y);
                 });
 
                 // TRANSPORTE
